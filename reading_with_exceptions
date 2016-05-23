@@ -1,0 +1,146 @@
+package reading_with_exceptions;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class Reading_With_Exceptions {
+
+	void process(String inputFilename)
+	{
+		Scanner input = null;
+		PrintStream ps = null;
+		String outputFileName = null;
+		int numIntsToRead = -1;
+
+		try
+		{
+			FileInputStream fi = new FileInputStream(inputFilename);
+			input =  new Scanner(fi);
+
+			outputFileName = input.next();
+			FileOutputStream fo = new FileOutputStream(outputFileName);
+
+			ps = new PrintStream(fo);
+
+			if(input.hasNextInt())
+			{
+				numIntsToRead = input.nextInt();
+			}
+			else
+			{
+				System.out.println("Error wrong input for number of integers to copy to file: " + input.next() 
+				+ " copying all integers to file.");	
+			}
+
+			copyNumbers(input, ps, numIntsToRead);
+
+			System.out.println(outputFileName + " created with the following output:");
+
+			printToScreen(outputFileName);
+		}
+
+		catch(FileNotFoundException e)
+		{
+			System.out.println("Error file not found " + e);
+		}
+
+		finally
+		{
+			if(input != null)
+			{
+				input.close();
+			}
+			if(ps != null)
+			{
+				ps.close();
+			}
+		}
+	}
+
+	void copyNumbers(Scanner scan, PrintStream ps, int numIntsToRead)
+	{
+		int i = 0;
+
+		if(numIntsToRead == -1)
+		{
+			while(scan.hasNext())
+			{
+				try{
+					int x =scan.nextInt();
+					ps.print(x + " ");
+					i++;
+					if(i % 10 == 0)
+					{
+						ps.println();
+					}
+				}
+
+				catch(InputMismatchException e)
+				{
+					System.out.println("Error wrong input " + e + " " + scan.next());
+				}
+			}
+		}
+		else
+		{
+			while(scan.hasNext() && i <= (numIntsToRead - 1))
+			{
+				try{
+					int x =scan.nextInt();
+					ps.print(x + " ");
+					i++;
+					if(i % 10 == 0)
+					{
+						ps.println();
+					}
+				}
+
+				catch(InputMismatchException e)
+				{
+					System.out.println("Error wrong input " + e + " " + scan.next());
+				}
+			}
+			if(i != numIntsToRead)
+			{
+				System.out.println("Error number of integers indicated to copy greater than actual number of integers: " + numIntsToRead);
+			}
+		}
+	}
+
+
+	public static void main(String[] args) {
+		Reading_With_Exceptions rwe = new Reading_With_Exceptions();
+		for (int i=0; i < args.length; i++)
+		{
+			System.out.println("\n\n=========== Processing "+ args[i] + " ==========\n");
+			rwe.process(args[i]);
+		}
+
+	}
+
+	private void printToScreen(String filename)
+	{
+		Scanner scan = null;
+		try {
+			FileInputStream fis = new FileInputStream(filename);
+			scan = new Scanner(fis);
+			while (scan.hasNextLine())
+			{
+				System.out.println(scan.nextLine());
+			}
+		} 
+		catch (FileNotFoundException e) 
+		{
+			System.out.println("printToScreen: can't open: " + filename);
+		}
+		finally
+		{
+			if (scan != null)
+				scan.close();
+		}
+	}
+}
